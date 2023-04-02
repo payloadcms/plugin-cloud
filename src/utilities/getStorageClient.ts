@@ -27,6 +27,7 @@ export const getStorageClient: GetStorageClient = async () => {
   )
 
   const cognitoIdentity = new CognitoIdentityClient({
+    region: 'us-east-1',
     credentials: fromCognitoIdentityPool({
       identityPoolId: process.env.PAYLOAD_CLOUD_COGNITO_IDENTITY_POOL_ID as string,
       logins: {
