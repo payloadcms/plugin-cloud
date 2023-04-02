@@ -14,6 +14,15 @@ let session: CognitoUserSession | null = null
 let identityID: string
 
 export const getStorageClient: GetStorageClient = async () => {
+  console.log({
+    PAYLOAD_CLOUD_BUCKET_REGION: process.env.PAYLOAD_CLOUD_BUCKET_REGION,
+    PAYLOAD_CLOUD_COGNITO_IDENTITY_POOL_ID: process.env.PAYLOAD_CLOUD_COGNITO_IDENTITY_POOL_ID,
+    PAYLOAD_CLOUD_COGNITO_USER_POOL_ID: process.env.PAYLOAD_CLOUD_COGNITO_USER_POOL_ID,
+    PAYLOAD_CLOUD_COGNITO_PASSWORD: process.env.PAYLOAD_CLOUD_COGNITO_PASSWORD,
+    PAYLOAD_CLOUD_PROJECT_ID: process.env.PAYLOAD_CLOUD_PROJECT_ID,
+    identityID,
+  })
+
   if (storageClient && session?.isValid()) {
     return {
       storageClient,
@@ -25,6 +34,7 @@ export const getStorageClient: GetStorageClient = async () => {
     process.env.PAYLOAD_CLOUD_PROJECT_ID as string,
     process.env.PAYLOAD_CLOUD_COGNITO_PASSWORD as string,
   )
+  console.log({ session })
 
   const cognitoIdentity = new CognitoIdentityClient({
     region: 'us-east-1',
@@ -36,8 +46,10 @@ export const getStorageClient: GetStorageClient = async () => {
       },
     }),
   })
+  console.log({ cognitoIdentity })
 
   const credentials = await cognitoIdentity.config.credentials()
+  console.log({ credentials })
 
   // @ts-expect-error
   identityID = credentials.identityId
@@ -46,6 +58,8 @@ export const getStorageClient: GetStorageClient = async () => {
     region: process.env.PAYLOAD_CLOUD_BUCKET_REGION,
     credentials,
   })
+
+  console.log({ storageClient })
 
   return {
     storageClient,
