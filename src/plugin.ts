@@ -3,9 +3,12 @@ import { extendWebpackConfig } from './webpack'
 import { getBeforeChangeHook } from './hooks/beforeChange'
 import { getAfterDeleteHook } from './hooks/afterDelete'
 import { getStaticHandler } from './staticHandler'
+import { payloadCloudEmail } from './email'
+import type { PluginOptions } from './types'
+import { getEnvVar } from './utilities/getEnvVar'
 
 export const payloadCloud =
-  (/** Possible args in the future */) =>
+  (pluginOptions?: PluginOptions) =>
   (config: Config): Config => {
     const webpack = extendWebpackConfig(config)
 
@@ -19,7 +22,7 @@ export const payloadCloud =
       }
     }
 
-    return {
+    const modifiedConfig: Config = {
       ...config,
       upload: {
         ...(config.upload || {}),
@@ -61,4 +64,15 @@ export const payloadCloud =
         return collection
       }),
     }
+
+    // Configure Payload Cloud Email if configured
+    if (pluginOptions?.email !== false) {
+      modifiedConfig.email = payloadCloudEmail({
+        config,
+        apiKey: getEnvVar('PAYLOAD_CLOUD_EMAIL_API_KEY'),
+        defaultDomain: getEnvVar('PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN'),
+      })
+    }
+
+    return modifiedConfig
   }
