@@ -43,7 +43,7 @@
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
     "nodemon": "^2.0.6",
-    "payload": "^1.6.19",
+    "payload": "^1.7.3",
     "prettier": "^2.7.1",
     "rimraf": "^4.1.2",
     "ts-node": "^10.9.1",
