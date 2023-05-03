@@ -7,10 +7,11 @@
   "license": "SEE LICENSE IN LICENSE.MD",
   "scripts": {
     "build": "tsc",
+    "test": "jest",
     "lint": "eslint src",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
     "clean": "rimraf dist && rimraf dev/yarn.lock",
-    "prepublishOnly": "yarn clean && yarn build"
+    "prepublishOnly": "yarn clean && yarn build && yarn test"
   },
   "peerDependencies": {
     "nodemailer": "^6.9.0",
