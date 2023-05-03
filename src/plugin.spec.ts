@@ -8,6 +8,9 @@ describe('plugin', () => {
 
   beforeAll(() => {
     jest.mock('resend')
+  })
+
+  beforeEach(() => {
     defaultConfig = { ...defaults }
   })
 
@@ -35,7 +38,7 @@ describe('plugin', () => {
     })
 
     it('should allow email opt-out', () => {
-      const plugin = payloadCloud({ email: false })
+      const plugin = payloadCloud({ disableEmail: true })
       const config = plugin(defaultConfig)
 
       assertPluginDidNotRun(config)
@@ -96,6 +99,7 @@ function assertPluginRan(config: Config) {
   }
 }
 
+/** Asserts that plugin did not run (other than webpack aliases) */
 function assertPluginDidNotRun(config: Config) {
   expect(config.admin).toHaveProperty('webpack')
   if (config.email && 'transport' in config.email) {

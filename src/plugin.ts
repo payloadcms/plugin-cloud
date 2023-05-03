@@ -66,7 +66,7 @@ export const payloadCloud =
     }
 
     // Configure Payload Cloud Email if configured
-    if (pluginOptions?.email !== false) {
+    if (pluginOptions && pluginOptions.disableEmail !== true) {
       modifiedConfig.email = payloadCloudEmail({
         config,
         apiKey: getEnvVar('PAYLOAD_CLOUD_EMAIL_API_KEY'),

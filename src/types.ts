@@ -49,5 +49,6 @@ export interface PayloadCloudEmailOptions {
 }
 
 export interface PluginOptions {
-  email?: PayloadCloudEmailOptions | false
+  disableEmail?: true
+  disableStorage?: true
 }
