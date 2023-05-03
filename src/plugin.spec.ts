@@ -4,22 +4,17 @@ import { payloadCloud } from './plugin'
 import nodemailer from 'nodemailer'
 
 describe('plugin', () => {
-  let defaultConfig: Config
-
   beforeAll(() => {
     jest.mock('resend')
   })
 
-  beforeEach(() => {
-    defaultConfig = { ...defaults }
-  })
-
   describe('not in Payload Cloud', () => {
-    it('should return unmodified config', () => {
+    it('should return unmodified config, with webpack aliases', () => {
       const plugin = payloadCloud()
-      const config = plugin(defaultConfig)
+      const config = plugin(createConfig())
 
-      assertPluginDidNotRun(config)
+      assertNoCloudStorage(config)
+      assertNoCloudEmail(config)
     })
   })
 
@@ -30,69 +25,95 @@ describe('plugin', () => {
       process.env.PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN = 'test-domain.com'
     })
 
-    it('should default to using payload cloud email', () => {
-      const plugin = payloadCloud()
-      const config = plugin(defaultConfig)
+    describe('storage', () => {
+      it('should default to using payload cloud storage', () => {
+        const plugin = payloadCloud()
+        const config = plugin(createConfig())
 
-      assertPluginRan(config)
-    })
-
-    it('should allow email opt-out', () => {
-      const plugin = payloadCloud({ disableEmail: true })
-      const config = plugin(defaultConfig)
-
-      assertPluginDidNotRun(config)
-    })
-
-    it('should not modify existing email transport', () => {
-      const existingTransport = nodemailer.createTransport({
-        name: 'existing-transport',
-        version: '0.0.1',
-        send: async mail => {
-          console.log('mock send', mail)
-        },
+        assertCloudStorage(config)
       })
 
-      const configWithExistingTransport: Config = {
-        ...defaultConfig,
-        email: {
-          fromName: 'Test',
-          fromAddress: 'test@test.com',
-          transport: existingTransport,
-        },
-      }
+      it('should allow disableStorage', () => {
+        const plugin = payloadCloud({ disableStorage: true })
+        const config = plugin(createConfig())
 
-      const plugin = payloadCloud()
-      const config = plugin(configWithExistingTransport)
-
-      expect(
-        config.email && 'transport' in config.email && config.email.transport?.transporter.name,
-      ).toEqual('existing-transport')
-
-      assertPluginDidNotRun(config)
+        assertNoCloudStorage(config)
+      })
     })
 
-    it('should allow setting fromName and fromAddress', () => {
-      const configWithPartialEmail: Config = {
-        ...defaultConfig,
-        email: {
-          fromName: 'Test',
-          fromAddress: 'test@test.com',
-        },
-      }
+    describe('email', () => {
+      it('should default to using payload cloud email', () => {
+        const plugin = payloadCloud()
+        const config = plugin(createConfig())
 
-      const plugin = payloadCloud()
-      const config = plugin(configWithPartialEmail)
+        assertCloudEmail(config)
+      })
 
-      expect(config.email?.fromName).toEqual(configWithPartialEmail.email?.fromName)
-      expect(config.email?.fromAddress).toEqual(configWithPartialEmail.email?.fromAddress)
+      it('should allow disableEmail', () => {
+        const plugin = payloadCloud({ disableEmail: true })
+        const config = plugin(createConfig())
 
-      assertPluginRan(config)
+        assertNoCloudEmail(config)
+      })
+
+      it('should not modify existing email transport', () => {
+        const existingTransport = nodemailer.createTransport({
+          name: 'existing-transport',
+          version: '0.0.1',
+          send: async mail => {
+            console.log('mock send', mail)
+          },
+        })
+
+        const configWithTransport = createConfig({
+          email: {
+            fromName: 'Test',
+            fromAddress: 'test@test.com',
+            transport: existingTransport,
+          },
+        })
+
+        const plugin = payloadCloud()
+        const config = plugin(configWithTransport)
+
+        expect(
+          config.email && 'transport' in config.email && config.email.transport?.transporter.name,
+        ).toEqual('existing-transport')
+
+        assertNoCloudEmail(config)
+      })
+
+      it('should allow setting fromName and fromAddress', () => {
+        const configWithPartialEmail = createConfig({
+          email: {
+            fromName: 'Test',
+            fromAddress: 'test@test.com',
+          },
+        })
+
+        const plugin = payloadCloud()
+        const config = plugin(configWithPartialEmail)
+
+        expect(config.email?.fromName).toEqual(configWithPartialEmail.email?.fromName)
+        expect(config.email?.fromAddress).toEqual(configWithPartialEmail.email?.fromAddress)
+
+        assertCloudEmail(config)
+      })
     })
   })
 })
 
-function assertPluginRan(config: Config) {
+function assertCloudStorage(config: Config) {
+  expect(config.admin).toHaveProperty('webpack')
+  expect(config.upload?.useTempFiles).toEqual(true)
+}
+
+function assertNoCloudStorage(config: Config) {
+  expect(config.admin).toHaveProperty('webpack')
+  expect(config.upload?.useTempFiles).toBeFalsy()
+}
+
+function assertCloudEmail(config: Config) {
   expect(config.admin).toHaveProperty('webpack')
   if (config.email && 'transport' in config.email) {
     expect(config.email?.transport?.transporter.name).toEqual('payload-cloud')
@@ -100,9 +121,16 @@ function assertPluginRan(config: Config) {
 }
 
 /** Asserts that plugin did not run (other than webpack aliases) */
-function assertPluginDidNotRun(config: Config) {
+function assertNoCloudEmail(config: Config) {
   expect(config.admin).toHaveProperty('webpack')
   if (config.email && 'transport' in config.email) {
     expect(config.email?.transport?.transporter.name).not.toEqual('payload-cloud')
+  }
+}
+
+function createConfig(overrides?: Partial<Config>): Config {
+  return {
+    ...defaults,
+    ...overrides,
   }
 }
