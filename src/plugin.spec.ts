@@ -33,11 +33,21 @@ describe('plugin', () => {
         assertCloudStorage(config)
       })
 
-      it('should allow disableStorage', () => {
-        const plugin = payloadCloud({ disableStorage: true })
+      it('should allow opt-out', () => {
+        const plugin = payloadCloud({ storage: false })
         const config = plugin(createConfig())
 
         assertNoCloudStorage(config)
+      })
+
+      it('should allow PAYLOAD_CLOUD_EMAIL_* env vars to be unset', () => {
+        delete process.env.PAYLOAD_CLOUD_EMAIL_API_KEY
+        delete process.env.PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN
+
+        const plugin = payloadCloud()
+        const config = plugin(createConfig())
+
+        assertNoCloudEmail(config)
       })
     })
 
@@ -49,8 +59,8 @@ describe('plugin', () => {
         assertCloudEmail(config)
       })
 
-      it('should allow disableEmail', () => {
-        const plugin = payloadCloud({ disableEmail: true })
+      it('should allow opt-out', () => {
+        const plugin = payloadCloud({ email: false })
         const config = plugin(createConfig())
 
         assertNoCloudEmail(config)
@@ -123,7 +133,11 @@ function assertCloudEmail(config: Config) {
 /** Asserts that plugin did not run (other than webpack aliases) */
 function assertNoCloudEmail(config: Config) {
   expect(config.admin).toHaveProperty('webpack')
-  if (config.email && 'transport' in config.email) {
+
+  // No transport set
+  if (!config.email) return
+
+  if ('transport' in config.email) {
     expect(config.email?.transport?.transporter.name).not.toEqual('payload-cloud')
   }
 }

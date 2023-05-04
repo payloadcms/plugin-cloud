@@ -5,7 +5,6 @@ import { getAfterDeleteHook } from './hooks/afterDelete'
 import { getStaticHandler } from './staticHandler'
 import { payloadCloudEmail } from './email'
 import type { PluginOptions } from './types'
-import { getEnvVar } from './utilities/getEnvVar'
 
 export const payloadCloud =
   (pluginOptions?: PluginOptions) =>
@@ -20,7 +19,7 @@ export const payloadCloud =
     }
 
     // Configure cloud storage
-    if (!pluginOptions?.disableStorage) {
+    if (pluginOptions?.storage !== false) {
       config = {
         ...config,
         upload: {
@@ -62,11 +61,13 @@ export const payloadCloud =
     }
 
     // Configure cloud email
-    if (pluginOptions && pluginOptions.disableEmail !== true) {
+    const apiKey = process.env.PAYLOAD_CLOUD_EMAIL_API_KEY
+    const defaultDomain = process.env.PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN
+    if (pluginOptions?.email !== false && apiKey && defaultDomain) {
       config.email = payloadCloudEmail({
         config,
-        apiKey: getEnvVar('PAYLOAD_CLOUD_EMAIL_API_KEY'),
-        defaultDomain: getEnvVar('PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN'),
+        apiKey,
+        defaultDomain,
       })
     }
 
