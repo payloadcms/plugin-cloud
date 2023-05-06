@@ -18,10 +18,9 @@
     "payload": "^1.6.21"
   },
   "files": [
-    "dist",
-    "*.js",
-    "*.d.ts",
-    "!.prettierrc.js"
+    "!.spec.*",
+    "!mocks",
+    "dist"
   ],
   "dependencies": {
     "@aws-sdk/client-cognito-identity": "^3.289.0",
