@@ -2,7 +2,7 @@ import type { NextFunction, Response } from 'express'
 import type { TypeWithID } from 'payload/dist/collections/config/types'
 import type { FileData } from 'payload/dist/uploads/types'
 import type { CollectionConfig, PayloadRequest } from 'payload/types'
-import type { Config, EmailOptions } from 'payload/config'
+import type { Config } from 'payload/config'
 
 export interface File {
   buffer: Buffer

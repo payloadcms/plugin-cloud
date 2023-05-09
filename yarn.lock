@@ -7572,10 +7572,10 @@ pause@0.0.1:
   resolved "https://registry.npmjs.org/pause/-/pause-0.0.1.tgz#1d408b3fdb76923b9543d96fb4c9dfd535d9cb5d"
   integrity sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg==
 
-payload@^1.7.3:
-  version "1.7.3"
-  resolved "https://registry.npmjs.org/payload/-/payload-1.7.3.tgz#8ab2c18bddc76c16d04a9cfd7810137f2ef7b769"
-  integrity sha512-JaPvgSRpRES8NG9XMOVV6mreII80rPkZvne0dYfQ1BNP2aW43ajbD1lsEWxE0kbcKFy7zoljHyiz/C/sw4z+Nw==
+payload@^1.7.5:
+  version "1.7.5"
+  resolved "https://registry.npmjs.org/payload/-/payload-1.7.5.tgz#178068de5dce94472e8585d13ce218568e572e23"
+  integrity sha512-+NIgU6+ZVhovluK0xCFXuF+giinUJ1VVXK3iuJt2BoyaKDZuofW7b0393DKSq4mII2txV2RsWA2LYma9sgvlnw==
   dependencies:
     "@date-io/date-fns" "^2.16.0"
     "@dnd-kit/core" "^6.0.7"

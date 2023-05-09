@@ -8,10 +8,13 @@ import type { PluginOptions } from './types'
 
 export const payloadCloud =
   (pluginOptions?: PluginOptions) =>
-  (config: Config): Config => {
+  (incomingConfig: Config): Config => {
+    let config = { ...incomingConfig }
+    const webpack = extendWebpackConfig(incomingConfig)
+
     config.admin = {
       ...(config.admin || {}),
-      webpack: extendWebpackConfig(config),
+      webpack,
     }
 
     if (process.env.PAYLOAD_CLOUD !== 'true') {
