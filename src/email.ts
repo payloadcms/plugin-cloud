@@ -62,12 +62,18 @@ export const payloadCloudEmail = (args: PayloadCloudEmailOptions): EmailTranspor
       }
 
       try {
-        await resend.sendEmail({
+        const sendResponse = await resend.sendEmail({
           from: fromToUse,
           to: cleanTo,
           subject: subject || '<No subject>',
           html: (html || text) as string,
         })
+
+        if ('error' in sendResponse) {
+          payload.logger.error({ msg: 'Error sending email', err: sendResponse.error })
+        } else {
+          payload.logger.info({ msg: 'Email sent', emailId: sendResponse.id })
+        }
       } catch (err: unknown) {
         payload.logger.error({ err })
       }
