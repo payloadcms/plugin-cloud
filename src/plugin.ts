@@ -65,7 +65,7 @@ export const payloadCloud =
 
     // Configure cloud email
     const apiKey = process.env.PAYLOAD_CLOUD_EMAIL_API_KEY
-    const defaultDomain = process.env.PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN
+    const defaultDomain = process.env.PAYLOAD_CLOUD_DEFAULT_DOMAIN
     if (pluginOptions?.email !== false && apiKey && defaultDomain) {
       config.email = payloadCloudEmail({
         config,

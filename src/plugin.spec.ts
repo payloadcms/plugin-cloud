@@ -22,7 +22,7 @@ describe('plugin', () => {
     beforeEach(() => {
       process.env.PAYLOAD_CLOUD = 'true'
       process.env.PAYLOAD_CLOUD_EMAIL_API_KEY = 'test-key'
-      process.env.PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN = 'test-domain.com'
+      process.env.PAYLOAD_CLOUD_DEFAULT_DOMAIN = 'test-domain.com'
     })
 
     describe('storage', () => {
@@ -42,7 +42,7 @@ describe('plugin', () => {
 
       it('should allow PAYLOAD_CLOUD_EMAIL_* env vars to be unset', () => {
         delete process.env.PAYLOAD_CLOUD_EMAIL_API_KEY
-        delete process.env.PAYLOAD_CLOUD_EMAIL_DEFAULT_DOMAIN
+        delete process.env.PAYLOAD_CLOUD_DEFAULT_DOMAIN
 
         const plugin = payloadCloud()
         const config = plugin(createConfig())
