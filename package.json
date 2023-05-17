@@ -15,7 +15,7 @@
   },
   "peerDependencies": {
     "nodemailer": "^6.9.0",
-    "payload": "^1.6.21"
+    "payload": "^1.8.2"
   },
   "files": [
     "!.spec.*",
