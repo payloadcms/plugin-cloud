@@ -75,7 +75,7 @@ export const payloadCloudEmail = (args: PayloadCloudEmailOptions): EmailTranspor
           payload.logger.info({ msg: 'Email sent', emailId: sendResponse.id })
         }
       } catch (err: unknown) {
-        payload.logger.error({ err })
+        payload.logger.error({ msg: 'Unexpected error sending email', err })
       }
     },
   }
