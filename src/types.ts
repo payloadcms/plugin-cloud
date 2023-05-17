@@ -49,6 +49,12 @@ export interface PayloadCloudEmailOptions {
 }
 
 export interface PluginOptions {
+  /** Payload Cloud Email
+   * @default true
+   */
   email?: false
+  /** Payload Cloud Storage
+   * @default true
+   */
   storage?: false
 }
