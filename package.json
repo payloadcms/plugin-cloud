@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "build:watch": "tsc -w",
     "lint": "eslint src",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
     "clean": "rimraf dist && rimraf dev/yarn.lock",
