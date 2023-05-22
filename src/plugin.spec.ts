@@ -39,16 +39,6 @@ describe('plugin', () => {
 
         assertNoCloudStorage(config)
       })
-
-      it('should allow PAYLOAD_CLOUD_EMAIL_* env vars to be unset', () => {
-        delete process.env.PAYLOAD_CLOUD_EMAIL_API_KEY
-        delete process.env.PAYLOAD_CLOUD_DEFAULT_DOMAIN
-
-        const plugin = payloadCloud()
-        const config = plugin(createConfig())
-
-        assertNoCloudEmail(config)
-      })
     })
 
     describe('email', () => {
@@ -61,6 +51,16 @@ describe('plugin', () => {
 
       it('should allow opt-out', () => {
         const plugin = payloadCloud({ email: false })
+        const config = plugin(createConfig())
+
+        assertNoCloudEmail(config)
+      })
+
+      it('should allow PAYLOAD_CLOUD_EMAIL_* env vars to be unset', () => {
+        delete process.env.PAYLOAD_CLOUD_EMAIL_API_KEY
+        delete process.env.PAYLOAD_CLOUD_DEFAULT_DOMAIN
+
+        const plugin = payloadCloud()
         const config = plugin(createConfig())
 
         assertNoCloudEmail(config)
