@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer'
 import { Resend } from 'resend'
-import payload from 'payload'
 import type { EmailTransport } from 'payload/config'
 import type { PayloadCloudEmailOptions } from './types'
 
@@ -65,12 +64,12 @@ export const payloadCloudEmail = (args: PayloadCloudEmailOptions): EmailTranspor
   const transportConfig: TransportArgs = {
     name: 'payload-cloud',
     version: '0.0.1',
-    send: async mail => {
+    send: async (mail, callback) => {
       const { from, to, subject, html, text } = mail.data
 
-      if (!to) throw new Error('No "to" address provided')
+      if (!to) return callback(new Error('No "to" address provided'), null)
 
-      if (!from) throw new Error('No "from" address provided')
+      if (!from) return callback(new Error('No "from" address provided'), null)
 
       const cleanTo: string[] = []
       const toArr = Array.isArray(to) ? to : [to]
@@ -97,17 +96,20 @@ export const payloadCloudEmail = (args: PayloadCloudEmailOptions): EmailTranspor
       const domainMatch = fromToUse.match(/(?<=@)[^(\s|>)]+/g)
 
       if (!domainMatch) {
-        throw new Error(`Could not parse domain from "from" address: ${fromToUse}`)
+        return callback(new Error(`Could not parse domain from "from" address: ${fromToUse}`), null)
       }
 
       const fromDomain = domainMatch[0]
       const resend = resendDomainMap[fromDomain]
 
       if (!resend) {
-        throw new Error(
-          `No Resend instance found for domain: ${fromDomain}. Available domains: ${Object.keys(
-            resendDomainMap,
-          )}`,
+        callback(
+          new Error(
+            `No Resend instance found for domain: ${fromDomain}. Available domains: ${Object.keys(
+              resendDomainMap,
+            ).join(', ')}`,
+          ),
+          null,
         )
       }
 
@@ -120,10 +122,23 @@ export const payloadCloudEmail = (args: PayloadCloudEmailOptions): EmailTranspor
         })
 
         if ('error' in sendResponse) {
-          throw new Error('Error sending email', { cause: sendResponse.error })
+          return callback(new Error('Error sending email', { cause: sendResponse.error }), null)
         }
+        return callback(null, sendResponse)
       } catch (err: unknown) {
-        throw new Error('Unexpected error sending email', { cause: err })
+        if (isResendError(err)) {
+          return callback(
+            new Error(`Error sending email: ${err.statusCode} ${err.name}: ${err.message}`),
+            null,
+          )
+        } else if (err instanceof Error) {
+          return callback(
+            new Error(`Unexpected error sending email: ${err.message}: ${err.stack}`),
+            null,
+          )
+        } else {
+          return callback(new Error(`Unexpected error sending email: ${err}`), null)
+        }
       }
     },
   }
@@ -133,4 +148,16 @@ export const payloadCloudEmail = (args: PayloadCloudEmailOptions): EmailTranspor
     fromAddress: fromAddress,
     transport: nodemailer.createTransport(transportConfig),
   }
+}
+
+type ResendError = {
+  name: string
+  message: string
+  statusCode: number
+}
+
+function isResendError(err: unknown): err is ResendError {
+  return Boolean(
+    err && typeof err === 'object' && 'message' in err && 'statusCode' in err && 'name' in err,
+  )
 }
