@@ -5,6 +5,7 @@ import { getAfterDeleteHook } from './hooks/afterDelete'
 import { getStaticHandler } from './staticHandler'
 import { payloadCloudEmail } from './email'
 import type { PluginOptions } from './types'
+import { getCacheUploadsAfterChangeHook, getCacheUploadsAfterDeleteHook } from './hooks/uploadCache'
 
 export const payloadCloud =
   (pluginOptions?: PluginOptions) =>
@@ -20,6 +21,9 @@ export const payloadCloud =
     if (process.env.PAYLOAD_CLOUD !== 'true') {
       return config // only modified webpack
     }
+
+    const cacheKey = process.env.PAYLOAD_CLOUD_CACHE_KEY
+    const cachingEnabled = pluginOptions?.uploadCaching !== false && !!cacheKey
 
     // Configure cloud storage
     if (pluginOptions?.storage !== false) {
@@ -40,7 +44,7 @@ export const payloadCloud =
                   Array.isArray(collection.upload.handlers)
                     ? collection.upload.handlers
                     : []),
-                  getStaticHandler({ collection }),
+                  getStaticHandler({ collection, cachingEnabled }),
                 ],
                 disableLocalStorage: true,
               },
@@ -50,9 +54,14 @@ export const payloadCloud =
                   ...(collection.hooks?.beforeChange || []),
                   getBeforeChangeHook({ collection }),
                 ],
+                afterChange: [
+                  ...(collection.hooks?.afterChange || []),
+                  ...(cachingEnabled ? [getCacheUploadsAfterChangeHook({ cacheKey })] : []),
+                ],
                 afterDelete: [
                   ...(collection.hooks?.afterDelete || []),
                   getAfterDeleteHook({ collection }),
+                  ...(cachingEnabled ? [getCacheUploadsAfterDeleteHook({ cacheKey })] : []),
                 ],
               },
             }

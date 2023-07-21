@@ -57,4 +57,9 @@ export interface PluginOptions {
    * @default true
    */
   storage?: false
+  /**
+   * Upload caching
+   * @default true
+   */
+  uploadCaching?: false
 }
