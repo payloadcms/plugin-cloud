@@ -1,18 +1,25 @@
 import type { CollectionConfig } from 'payload/types'
 import type { Readable } from 'stream'
-import type { StaticHandler } from './types'
+import type { PluginOptions, StaticHandler } from './types'
 import { createKey } from './utilities/createKey'
 import { getStorageClient } from './utilities/getStorageClient'
 
 interface Args {
   collection: CollectionConfig
-  cachingEnabled?: boolean
-  cacheMaxAge?: number
+  cachingOptions?: PluginOptions['uploadCaching']
 }
 
-export const getStaticHandler =
-  ({ collection, cacheMaxAge, cachingEnabled }: Args): StaticHandler =>
-  async (req, res, next) => {
+export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHandler => {
+  const cachingEnabled = cachingOptions !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
+
+  let maxAge = 86400 // 24 hours default
+  if (cachingEnabled) {
+    if (typeof cachingOptions === 'object') {
+      maxAge = cachingOptions[collection.slug]?.maxAge || maxAge
+    }
+    console.log(`uploadCaching: Caching for '${collection.slug}' set to ${maxAge} seconds`)
+  }
+  return async (req, res, next) => {
     try {
       const { storageClient, identityID } = await getStorageClient()
 
@@ -26,8 +33,6 @@ export const getStaticHandler =
         Bucket: process.env.PAYLOAD_CLOUD_BUCKET,
         Key,
       })
-
-      const maxAge = cacheMaxAge || 86400 // 24 hours
 
       res.set({
         'Content-Length': object.ContentLength,
@@ -53,3 +58,4 @@ export const getStaticHandler =
       return next()
     }
   }
+}

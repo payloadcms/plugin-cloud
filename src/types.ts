@@ -53,13 +53,36 @@ export interface PluginOptions {
    * @default true
    */
   email?: false
+
   /** Payload Cloud Storage
    * @default true
    */
   storage?: false
+
   /**
-   * Upload caching
+   * Upload caching. Defaults to 24 hours for all collections.
+   *
+   * Optionally configure caching per collection
+   *
+   * ```ts
+   * {
+   *   collectionSlug: {
+   *    maxAge: 3600 // Custom value in seconds
+   *   }
+   * }
+   * ```
+   *
    * @default true
    */
-  uploadCaching?: false
+
+  uploadCaching?:
+    | false
+    | Record<
+        string,
+        {
+          /** Caching in seconds
+           * @default 86400 (24 hours) */
+          maxAge: number
+        }
+      >
 }

@@ -22,8 +22,8 @@ export const payloadCloud =
       return config // only modified webpack
     }
 
-    const cacheKey = process.env.PAYLOAD_CLOUD_CACHE_KEY
-    const cachingEnabled = pluginOptions?.uploadCaching !== false && !!cacheKey
+    const cachingEnabled =
+      pluginOptions?.uploadCaching !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
 
     // Configure cloud storage
     if (pluginOptions?.storage !== false) {
@@ -44,7 +44,10 @@ export const payloadCloud =
                   Array.isArray(collection.upload.handlers)
                     ? collection.upload.handlers
                     : []),
-                  getStaticHandler({ collection, cachingEnabled }),
+                  getStaticHandler({
+                    collection,
+                    cachingOptions: pluginOptions?.uploadCaching,
+                  }),
                 ],
                 disableLocalStorage: true,
               },
@@ -56,12 +59,12 @@ export const payloadCloud =
                 ],
                 afterChange: [
                   ...(collection.hooks?.afterChange || []),
-                  ...(cachingEnabled ? [getCacheUploadsAfterChangeHook({ cacheKey })] : []),
+                  ...(cachingEnabled ? [getCacheUploadsAfterChangeHook()] : []),
                 ],
                 afterDelete: [
                   ...(collection.hooks?.afterDelete || []),
                   getAfterDeleteHook({ collection }),
-                  ...(cachingEnabled ? [getCacheUploadsAfterDeleteHook({ cacheKey })] : []),
+                  ...(cachingEnabled ? [getCacheUploadsAfterDeleteHook()] : []),
                 ],
               },
             }

@@ -4,14 +4,10 @@ import {
   CollectionConfig,
 } from 'payload/types'
 
-interface Args {
-  cacheKey?: string
-}
-
 export const getCacheUploadsAfterChangeHook =
-  ({ cacheKey }: Args): CollectionAfterChangeHook =>
+  (): CollectionAfterChangeHook =>
   async ({ operation, req, doc }) => {
-    if (!req || !cacheKey) return doc
+    if (!req || !process.env.PAYLOAD_CLOUD_CACHE_KEY) return doc
 
     const { res } = req
     if (res) {
@@ -20,7 +16,7 @@ export const getCacheUploadsAfterChangeHook =
           msg: 'TODO: Purge cache in CF after update',
           body: {
             projectID: process.env.PAYLOAD_CLOUD_PROJECT_ID,
-            cacheKey,
+            cacheKey: process.env.PAYLOAD_CLOUD_CACHE_KEY,
             filepath: doc.url,
           },
         })
@@ -30,9 +26,9 @@ export const getCacheUploadsAfterChangeHook =
   }
 
 export const getCacheUploadsAfterDeleteHook =
-  ({ cacheKey }: Args): CollectionAfterDeleteHook =>
+  (): CollectionAfterDeleteHook =>
   async ({ req, doc }) => {
-    if (!req) return doc
+    if (!req || !process.env.PAYLOAD_CLOUD_CACHE_KEY) return doc
 
     req.payload.logger.debug({ msg: 'After delete hook...' })
     const { res } = req
@@ -41,7 +37,7 @@ export const getCacheUploadsAfterDeleteHook =
         msg: 'TODO: Purge cache in CF after update',
         body: {
           projectID: process.env.PAYLOAD_CLOUD_PROJECT_ID,
-          cacheKey,
+          cacheKey: process.env.PAYLOAD_CLOUD_CACHE_KEY,
           filepath: doc.url,
         },
       })
