@@ -49,6 +49,13 @@ export interface PayloadCloudEmailOptions {
 }
 
 export interface PluginOptions {
+  /**
+   * Payload Cloud API endpoint
+   *
+   * @internal Endpoint override for developement
+   */
+  endpoint?: string
+
   /** Payload Cloud Email
    * @default true
    */

@@ -25,6 +25,9 @@ export const payloadCloud =
     const cachingEnabled =
       pluginOptions?.uploadCaching !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
 
+    // TODO: add environment var to be deployed from Payload Cloud
+    const apiEndpoint = pluginOptions?.endpoint || 'https://cloud-api.payloadcms.com'
+
     // Configure cloud storage
     if (pluginOptions?.storage !== false) {
       config = {
@@ -59,12 +62,16 @@ export const payloadCloud =
                 ],
                 afterChange: [
                   ...(collection.hooks?.afterChange || []),
-                  ...(cachingEnabled ? [getCacheUploadsAfterChangeHook()] : []),
+                  ...(cachingEnabled
+                    ? [getCacheUploadsAfterChangeHook({ endpoint: apiEndpoint })]
+                    : []),
                 ],
                 afterDelete: [
                   ...(collection.hooks?.afterDelete || []),
                   getAfterDeleteHook({ collection }),
-                  ...(cachingEnabled ? [getCacheUploadsAfterDeleteHook()] : []),
+                  ...(cachingEnabled
+                    ? [getCacheUploadsAfterDeleteHook({ endpoint: apiEndpoint })]
+                    : []),
                 ],
               },
             }
