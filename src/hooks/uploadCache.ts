@@ -22,12 +22,12 @@ export const getCacheUploadsAfterChangeHook =
           filepath: doc.url,
         }
         req.payload.logger.debug({
-          msg: 'TODO: Purge cache in CF after update',
+          msg: 'Purging cache in CF after update',
           body,
         })
 
         try {
-          await fetch(`${endpoint}/api/purge-cache`, {
+          const purgeRes = await fetch(`${endpoint}/api/purge-cache`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -35,6 +35,13 @@ export const getCacheUploadsAfterChangeHook =
             body: JSON.stringify({
               body,
             }),
+          })
+
+          const purgeResBody = await purgeRes.json()
+
+          req.payload.logger.debug({
+            msg: 'Purging cache in CF after update',
+            purgeResBody,
           })
         } catch (err: unknown) {
           req.payload.logger.error({ msg: '/purge-cache call failed', err, body })
@@ -58,12 +65,12 @@ export const getCacheUploadsAfterDeleteHook =
         filepath: doc.url,
       }
       req.payload.logger.debug({
-        msg: 'TODO: Purge cache in CF after delete',
+        msg: 'Purging cache in CF after delete',
         body,
       })
 
       try {
-        await fetch(`${endpoint}/api/purge-cache`, {
+        const puregRes = await fetch(`${endpoint}/api/purge-cache`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -71,6 +78,13 @@ export const getCacheUploadsAfterDeleteHook =
           body: JSON.stringify({
             body,
           }),
+        })
+
+        const purgeResBody = await puregRes.json()
+
+        req.payload.logger.debug({
+          msg: 'Purging cache in CF after delete',
+          purgeResBody,
         })
       } catch (err: unknown) {
         req.payload.logger.error({ msg: '/purge-cache call failed', err, body })
