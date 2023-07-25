@@ -25,7 +25,6 @@ export const payloadCloud =
     const cachingEnabled =
       pluginOptions?.uploadCaching !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
 
-    // TODO: add environment var to be deployed from Payload Cloud
     const apiEndpoint = pluginOptions?.endpoint || 'https://cloud-api.payloadcms.com'
 
     // Configure cloud storage

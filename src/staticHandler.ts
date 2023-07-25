@@ -10,15 +10,27 @@ interface Args {
 }
 
 export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHandler => {
-  const cachingEnabled = cachingOptions !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
+  let cachingEnabled = cachingOptions !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
 
   let maxAge = 86400 // 24 hours default
-  if (cachingEnabled) {
-    if (typeof cachingOptions === 'object') {
-      maxAge = cachingOptions[collection.slug]?.maxAge || maxAge
+
+  // Set custom maxAge for collection or disable caching for collection
+  if (
+    cachingEnabled &&
+    typeof cachingOptions === 'object' &&
+    typeof cachingOptions[collection.slug] === 'object'
+  ) {
+    if ('maxAge' in cachingOptions[collection.slug]) {
+      maxAge = cachingOptions[collection.slug].maxAge || maxAge
+    } else if (
+      'enabled' in cachingOptions[collection.slug] &&
+      !cachingOptions[collection.slug].enabled
+    ) {
+      cachingEnabled = false
     }
-    console.log(`uploadCaching: Caching for '${collection.slug}' set to ${maxAge} seconds`)
+    maxAge = cachingOptions[collection.slug]?.maxAge || maxAge
   }
+
   return async (req, res, next) => {
     try {
       const { storageClient, identityID } = await getStorageClient()

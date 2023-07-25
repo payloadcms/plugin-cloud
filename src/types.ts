@@ -73,8 +73,11 @@ export interface PluginOptions {
    *
    * ```ts
    * {
-   *   collectionSlug: {
+   *   collSlug1: {
    *    maxAge: 3600 // Custom value in seconds
+   *   },
+   *   collSlug2: {
+   *     enabled: false // Disable caching for this collection
    *   }
    * }
    * ```
@@ -88,8 +91,10 @@ export interface PluginOptions {
         string,
         {
           /** Caching in seconds
-           * @default 86400 (24 hours) */
-          maxAge: number
+           * @default 86400 (24 hours)
+           */
+          maxAge?: number
+          enabled?: false
         }
       >
 }
