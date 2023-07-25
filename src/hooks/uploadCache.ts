@@ -37,11 +37,9 @@ export const getCacheUploadsAfterChangeHook =
             }),
           })
 
-          const purgeResBody = await purgeRes.json()
-
           req.payload.logger.debug({
             msg: 'Purging cache in CF after update',
-            purgeResBody,
+            statusCode: purgeRes.status,
           })
         } catch (err: unknown) {
           req.payload.logger.error({ msg: '/purge-cache call failed', err, body })
