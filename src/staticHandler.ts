@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload/types'
 import type { Readable } from 'stream'
-import type { PluginOptions, StaticHandler } from './types'
+import type { CollectionCachingConfig, PluginOptions, StaticHandler } from './types'
 import { createKey } from './utilities/createKey'
 import { getStorageClient } from './utilities/getStorageClient'
 
@@ -10,25 +10,23 @@ interface Args {
 }
 
 export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHandler => {
-  let cachingEnabled = cachingOptions !== false && !!process.env.PAYLOAD_CLOUD_CACHE_KEY
-
   let maxAge = 86400 // 24 hours default
-
-  // Set custom maxAge for collection or disable caching for collection
-  if (
-    cachingEnabled &&
-    typeof cachingOptions === 'object' &&
-    typeof cachingOptions[collection.slug] === 'object'
-  ) {
-    if ('maxAge' in cachingOptions[collection.slug]) {
-      maxAge = cachingOptions[collection.slug].maxAge || maxAge
-    } else if (
-      'enabled' in cachingOptions[collection.slug] &&
-      !cachingOptions[collection.slug].enabled
-    ) {
-      cachingEnabled = false
-    }
+  let collCacheConfig: CollectionCachingConfig | undefined
+  if (cachingOptions !== false) {
+    // Set custom maxAge for all collections
+    maxAge = cachingOptions?.maxAge || maxAge
+    collCacheConfig = cachingOptions?.collections?.[collection.slug] || {}
   }
+
+  // Set maxAge using collection-specific override
+  maxAge = collCacheConfig?.maxAge || maxAge
+
+  let cachingEnabled =
+    cachingOptions !== false &&
+    !!process.env.PAYLOAD_CLOUD_CACHE_KEY &&
+    collCacheConfig?.enabled !== false
+
+  console.log({ cachingEnabled, maxAge })
 
   return async (req, res, next) => {
     try {
@@ -48,7 +46,6 @@ export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHa
       res.set({
         'Content-Length': object.ContentLength,
         'Content-Type': object.ContentType,
-        // Q: immutable any benefit here?
         ...(cachingEnabled && { 'Cache-Control': `public, max-age=${maxAge}` }),
         ETag: object.ETag,
       })

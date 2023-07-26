@@ -87,14 +87,27 @@ export interface PluginOptions {
 
   uploadCaching?:
     | false
-    | Record<
-        string,
-        {
-          /** Caching in seconds
-           * @default 86400 (24 hours)
-           */
-          maxAge?: number
-          enabled?: false
-        }
-      >
+    | {
+        /** Caching in seconds override for all collections
+         * @default 86400 (24 hours)
+         */
+        maxAge?: number
+        /**
+         * Caching configuration per-collection
+         */
+        collections?: Record<string, CollectionCachingConfig>
+      }
+}
+
+export type CollectionCachingConfig = {
+  /** Caching in seconds override for this collection
+   * @default 86400 (24 hours)
+   */
+  maxAge?: number
+  /**
+   * Enable/disable caching for this collection
+   *
+   * @default true
+   */
+  enabled?: boolean
 }
