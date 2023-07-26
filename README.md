@@ -51,9 +51,10 @@ If you wish to configure upload caching on a per-collection basis, you can do so
 ```ts
 payloadCloud({
   uploadCaching: {
+    maxAge: 604800, // Override default maxAge for all collections
     collection1Slug: {
-      maxAge: 604800 // 1 week override
-    }
+      maxAge: 10 // Collection-specific maxAge, takes precedence over others
+    },
     collection2Slug: {
       enabled: false // Disable caching for this collection
     }
