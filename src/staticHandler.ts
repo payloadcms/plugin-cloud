@@ -26,8 +26,6 @@ export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHa
     !!process.env.PAYLOAD_CLOUD_CACHE_KEY &&
     collCacheConfig?.enabled !== false
 
-  console.log({ cachingEnabled, maxAge })
-
   return async (req, res, next) => {
     try {
       const { storageClient, identityID } = await getStorageClient()
