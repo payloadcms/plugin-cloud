@@ -28,7 +28,6 @@ export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHa
     ) {
       cachingEnabled = false
     }
-    maxAge = cachingOptions[collection.slug]?.maxAge || maxAge
   }
 
   return async (req, res, next) => {
@@ -54,19 +53,13 @@ export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHa
         ETag: object.ETag,
       })
 
-      req.payload.logger.debug({
-        msg: 'Serving static file',
-        Key,
-        headers: res.getHeaders(),
-      })
-
       if (object?.Body) {
         return (object.Body as Readable).pipe(res)
       }
 
       return next()
     } catch (err: unknown) {
-      req.payload.logger.error(err)
+      req.payload.logger.error({ msg: 'Error getting file from cloud storage', err })
       return next()
     }
   }
