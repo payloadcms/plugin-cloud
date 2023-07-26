@@ -49,7 +49,7 @@ export const getStaticHandler = ({ collection, cachingOptions }: Args): StaticHa
         'Content-Length': object.ContentLength,
         'Content-Type': object.ContentType,
         // Q: immutable any benefit here?
-        ...(cachingEnabled && { 'Cache-Control': `public, max-age=${maxAge}, immutable` }),
+        ...(cachingEnabled && { 'Cache-Control': `public, max-age=${maxAge}` }),
         ETag: object.ETag,
       })
 
