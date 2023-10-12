@@ -1,5 +1,7 @@
 # Payload Cloud Plugin
 
+📢 Moved to [Payload Monorepo](https://github.com/payloadcms/payload/tree/main/packages/plugin-cloud) 📢
+
 This is the official Payload Cloud plugin that connects your Payload instance to the resources that Payload Cloud provides.
 
 ## File storage
